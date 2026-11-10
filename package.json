@@ -1,0 +1,48 @@
+{
+  "name": "epub-hunter",
+  "productName": "书猎",
+  "version": "2.3.0",
+  "description": "本地多格式电子书全文搜索与沉浸式阅读器（EPUB / MOBI / AZW3 / PDF / TXT）",
+  "main": "./out/main/index.js",
+  "author": "zhaocai",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc --noEmit",
+    "dist:win": "electron-vite build && node scripts/build-win.mjs",
+    "dist:dir": "electron-vite build && electron-builder --dir"
+  },
+  "dependencies": {
+    "@lingo-reader/mobi-parser": "0.4.6",
+    "fast-xml-parser": "^4.5.1",
+    "jszip": "^3.10.1",
+    "minisearch": "^7.1.1",
+    "pdfjs-dist": "4.10.38",
+    "pinia": "^2.3.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^2.3.0",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "electron",
+      "esbuild",
+      "vue-demi"
+    ],
+    "ignoredBuiltDependencies": [
+      "core-js",
+      "es5-ext"
+    ]
+  }
+}

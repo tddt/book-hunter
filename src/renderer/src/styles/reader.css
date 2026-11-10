@@ -1,0 +1,210 @@
+/* ---------------------------------------------------------------- 阅读器主题
+   外壳（工具栏 / 抽屉）用 --r-*，正文区由引擎注入 --nr-*，互不干扰 */
+[data-reader-theme='paper'] {
+  --r-bg: #ffffff; --r-fg: #2b2b2b; --r-shell: #ffffff; --r-shell-fg: #2b2b2b;
+  --r-chrome: #f7f7f8; --r-border: #e8e9ec; --r-muted: #8a8a8a; --r-hover: rgba(30,35,45,.06);
+}
+[data-reader-theme='sepia'] {
+  --r-bg: #f5ecd9; --r-fg: #4b3b2a; --r-shell: #f5ecd9; --r-shell-fg: #4b3b2a;
+  --r-chrome: #efe3cc; --r-border: #e0d0b3; --r-muted: #9b8a70; --r-hover: rgba(75,59,42,.08);
+}
+[data-reader-theme='green'] {
+  --r-bg: #e4f0e2; --r-fg: #2f4233; --r-shell: #e4f0e2; --r-shell-fg: #2f4233;
+  --r-chrome: #d7e8d5; --r-border: #c6ddc4; --r-muted: #7d9b80; --r-hover: rgba(47,66,51,.08);
+}
+[data-reader-theme='ink'] {
+  --r-bg: #e9e9e6; --r-fg: #333536; --r-shell: #e9e9e6; --r-shell-fg: #333536;
+  --r-chrome: #dededb; --r-border: #d0d0cd; --r-muted: #8d9093; --r-hover: rgba(51,53,54,.08);
+}
+[data-reader-theme='night'] {
+  --r-bg: #191b1f; --r-fg: #b7bcc6; --r-shell: #202329; --r-shell-fg: #c3c8d0;
+  --r-chrome: #262a31; --r-border: #343942; --r-muted: #787f8b; --r-hover: rgba(255,255,255,.08);
+}
+
+/* ---------------------------------------------------------------- 自研排版引擎 */
+.nr-root {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: var(--nr-bg);
+  color: var(--nr-fg);
+  --nr-vpad: 28px;
+}
+.nr-stage { position: absolute; inset: 0; }
+.nr-sheet {
+  position: absolute;
+  top: var(--nr-vpad);
+  bottom: var(--nr-vpad);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 100%;
+  overflow: hidden;
+  background: var(--nr-bg);
+}
+.nr-flow {
+  height: 100%;
+  box-sizing: border-box;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+.nr-root[data-animation='slide'] .nr-flow {
+  transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.nr-root[data-animation='none'] .nr-flow,
+.nr-root[data-animation='fade'] .nr-flow { transition: none; }
+.nr-fade { animation: nrFade 0.24s ease; }
+@keyframes nrFade { from { opacity: 0.25; } to { opacity: 1; } }
+
+.nr-article {
+  font-family: var(--nr-font);
+  font-size: var(--nr-font-size);
+  line-height: var(--nr-line-height);
+  color: var(--nr-fg);
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  /* 外壳 reader-root 为 user-select:none 以防误选 UI；正文必须显式恢复可选，
+     否则划词 / 划线 / 写笔记的选区永远拿不到（2.1 修复）。 */
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
+}
+
+/* 内容硬约束：原书内联样式已在解析层清理，这里是防撑破列宽的最后一道保险 */
+.nr-article, .nr-article * { box-sizing: border-box; }
+.nr-article * { overflow-wrap: anywhere; }
+.nr-article img, .nr-article svg, .nr-article image, .nr-article canvas,
+.nr-article video, .nr-article table, .nr-article figure, .nr-article hr,
+.nr-article blockquote, .nr-article pre, .nr-article div, .nr-article section {
+  max-width: 100% !important;
+}
+.nr-article img, .nr-article svg, .nr-article image, .nr-article canvas {
+  height: auto !important;
+}
+.nr-article table { width: auto !important; }
+.nr-article td, .nr-article th {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal !important;
+}
+.nr-article pre, .nr-article code { white-space: pre-wrap !important; word-break: break-word; }
+.nr-root.nr-scrolled .nr-article { padding: 4px 0 32vh; }
+.nr-article > :first-child { margin-top: 0; }
+.nr-article p { margin: 0 0 var(--nr-para); }
+.nr-root.nr-indent .nr-article p { text-indent: 2em; }
+.nr-root.nr-justify .nr-article p {
+  text-align: justify;
+  text-justify: inter-ideograph;
+}
+.nr-article h1, .nr-article h2, .nr-article h3,
+.nr-article h4, .nr-article h5, .nr-article h6 {
+  font-family: var(--nr-font);
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 1.5em 0 0.8em;
+  break-after: avoid;
+}
+.nr-article h1 { font-size: 1.45em; text-align: center; }
+.nr-article h2 { font-size: 1.25em; text-align: center; }
+.nr-article h3 { font-size: 1.12em; }
+.nr-article h4, .nr-article h5, .nr-article h6 { font-size: 1em; }
+.nr-article .title, .nr-article .chapter-title,
+.nr-article .center, .nr-article [align='center'] { text-align: center; }
+.nr-article img, .nr-article svg, .nr-article image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1em auto;
+  break-inside: avoid;
+}
+.nr-article blockquote {
+  margin: 1em 1.4em;
+  padding-left: 1em;
+  border-left: 2px solid var(--nr-muted);
+  color: var(--nr-muted);
+}
+.nr-article ul, .nr-article ol { padding-left: 2em; margin: 0 0 var(--nr-para); }
+.nr-article table { max-width: 100%; border-collapse: collapse; margin: 1em 0; }
+.nr-article td, .nr-article th { border: 1px solid var(--nr-muted); padding: 0.3em 0.6em; }
+.nr-article pre, .nr-article code {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.9em;
+}
+.nr-article hr { border: none; border-top: 1px solid var(--nr-muted); margin: 1.6em 0; }
+.nr-article sup, .nr-article sub { font-size: 0.72em; line-height: 0; }
+.nr-article a { color: var(--nr-link); text-decoration: none; }
+.nr-article a.nr-internal, .nr-article a.nr-external { cursor: pointer; }
+.nr-article a:hover { text-decoration: underline; }
+/* padding 必须为 0：插入 <mark> 不能改变文本宽度，否则高亮会让分页漂移 */
+.nr-article mark { color: inherit; border-radius: 2px; padding: 0; }
+.nr-article mark.nr-hl { background: var(--hl-color, #ffe27a); }
+.nr-article mark.nr-find { background: #ffd35c; box-shadow: 0 0 0 2px #ffd35c; }
+.nr-article .nr-empty { color: var(--nr-muted); text-align: center; padding-top: 30vh; }
+
+/* ---------------------------------------------------------------- 正文内嵌对照译文
+   译文作为普通段落进入同一个 nr-flow，版心 / 字体 / 字号 / 行距 / 主题 / 翻页 /
+   进度全部复用阅读引擎，与原文阅读体验一致，不再是右侧小字列表。 */
+.nr-article [data-nr-hidden] { display: none !important; }
+.nr-article .nr-tr {
+  font-family: var(--nr-font);
+  font-size: 0.94em;
+  line-height: var(--nr-line-height);
+  color: var(--nr-link);
+  margin: 0 0 calc(var(--nr-para) * 1.05);
+  padding: 0.1em 0 0.1em 0.8em;
+  border-left: 2px solid var(--nr-link);
+  text-indent: 0 !important;
+  text-align: justify;
+  text-justify: inter-ideograph;
+  opacity: 0.92;
+  user-select: text;
+  -webkit-user-select: text;
+}
+.nr-article .nr-tr.nr-tr-second {
+  color: var(--nr-muted);
+  border-left-color: var(--nr-muted);
+  opacity: 0.85;
+}
+.nr-article .nr-tr[data-nr-tr-label]::before {
+  content: attr(data-nr-tr-label);
+  display: inline-block;
+  margin-right: 0.5em;
+  font-size: 0.72em;
+  letter-spacing: 0.04em;
+  opacity: 0.65;
+  vertical-align: 0.12em;
+}
+.nr-article .nr-tr.nr-tr-pending { color: var(--nr-muted); font-style: italic; opacity: 0.6; }
+/* 仅译文模式：译文就是「正文」，完全沿用原文的字号与颜色，不再做对照标记 */
+.nr-root.nr-tr-only .nr-article .nr-tr {
+  color: var(--nr-fg);
+  font-size: 1em;
+  border-left-color: transparent;
+  padding-left: 0;
+  opacity: 1;
+}
+.nr-root.nr-tr-only .nr-article .nr-tr.nr-tr-second { color: var(--nr-muted); }
+
+/* 左右翻页热区只占版心外侧，不干扰正文选字 */
+.nr-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.nr-zone:hover { background: var(--r-hover, rgba(127, 127, 127, 0.04)); }
+.nr-prev { left: 0; }
+.nr-next { right: 0; }
+.nr-root.nr-scrolled .nr-zone { pointer-events: none; }
+
+/* 滚动条：细且不抢视觉 */
+.nr-root.nr-scrolled .nr-flow::-webkit-scrollbar { width: 6px; }
+.nr-root.nr-scrolled .nr-flow::-webkit-scrollbar-thumb {
+  background: var(--nr-muted);
+  opacity: 0.3;
+  border-radius: 3px;
+}

@@ -1,0 +1,62 @@
+appId: com.zhaocai.epubhunter
+productName: 书猎
+copyright: Copyright © 2026
+directories:
+  buildResources: build
+  output: dist
+files:
+  - out/**/*
+  - package.json
+# 图标只做 extraResources 随包分发，由 window.ts 运行时设置窗口 / 任务栏图标。
+# 关键：源文件绝不能放在 buildResources（build/）目录下 —— electron-builder 会
+# 自动发现 build/icon.ico 并调用 rcedit 改写 exe，即使这里没有 win.icon 配置。
+# 本机 rcedit 概率性报 "Unable to commit changes"，且被改写的 exe 会让 NSIS
+# 打包 __uninstaller 时报 "File: failed opening file"。
+extraResources:
+  - from: assets/icon.ico
+    to: icon.ico
+asar: true
+# 2.0 新增的两个格式解析库都是 ESM：
+#   pdfjs-dist/legacy/build/pdf.mjs、@lingo-reader/mobi-parser/dist/index.node.js
+# 主进程在 CJS 下用原生动态 import() 加载它们，而 Node 的 ESM loader 读取 asar 内文件
+# 并不稳定（且 pdfjs 还要访问随包资源）。解包到 app.asar.unpacked 后由 Electron 自动重定向，
+# 只影响这两个新依赖，1.0 的 EPUB / 阅读 / 搜索链路完全不变。
+# 必须带 `**/` 前缀：pnpm 的真实路径是
+# node_modules/.pnpm/<pkg>@<ver>/node_modules/<pkg>/...，写死 node_modules/<pkg>/** 匹配不到。
+asarUnpack:
+  - "**/pdfjs-dist/**/*"
+  - "**/mobi-parser/**/*"
+
+# 安装包层面注册 .epub 扩展名（NSIS 安装时写 HKCU 注册表）
+fileAssociations:
+  - ext: epub
+    name: EPUB 电子书
+    description: EPUB eBook
+    mimeType: application/epub+zip
+    role: Viewer
+
+win:
+  # 不要设置 signAndEditExecutable: false。实测关闭 rcedit 会让 NSIS 阶段
+  # "File: failed opening file __uninstaller..." 明显变频繁（rcedit 的重试耗时
+  # 恰好给安全软件留出了释放新 exe 句柄的窗口）。
+  # rcedit 偶发的 "⨯ Unable to commit changes" 是 electron-builder 内部自动重试，
+  # 最终 EXIT=0 即为成功；只有进程非零退出才是构建失败。
+  target:
+    - nsis
+    - portable
+  artifactName: ShuLie-${version}-${arch}.${ext}
+nsis:
+  # 安装版与便携版都产出 .exe，必须分别命名，否则 portable 会覆盖安装包
+  artifactName: ShuLie-Setup-${version}-${arch}.${ext}
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  shortcutName: 书猎
+portable:
+  artifactName: ShuLie-Portable-${version}-${arch}.${ext}
+mac:
+  target: dmg
+linux:
+  target: AppImage
+  category: Office

@@ -1,0 +1,200 @@
+:root {
+  /* ================= 设计系统 =================
+   * 冷调中性底色 + 靛蓝品牌色 + 暖金点缀。
+   * 整套应用只改这里即可换肤；阅读器主题是独立变量体系，不受影响。
+   * ============================================ */
+
+  /* ---------- 底色与表面 ---------- */
+  --c-bg: #f5f7fc;
+  --c-bg-grad: radial-gradient(1100px 620px at 8% -12%, #e9efff 0%, transparent 60%),
+    radial-gradient(900px 560px at 102% 104%, #f1edff 0%, transparent 58%),
+    radial-gradient(620px 420px at 52% 48%, rgba(255, 255, 255, 0.55), transparent 70%);
+  --c-surface: #ffffff;
+  --c-surface-2: #f9fbfe;
+  --c-surface-3: #edf2fa;
+  --c-surface-hover: #f2f6fd;
+  --c-border: #e4eaf4;
+  --c-border-strong: #d0daea;
+  --c-border-soft: #eef2f8;
+
+  /* ---------- 文字层级 ---------- */
+  --c-text: #172035;
+  --c-text-2: #586680;
+  --c-text-3: #96a3b9;
+
+  /* ---------- 品牌色 ---------- */
+  --c-primary: #3f68d8;
+  --c-primary-2: #6d8cf3;
+  --c-primary-hover: #3358c2;
+  --c-primary-weak: #ebf1ff;
+  --c-primary-ring: rgba(63, 104, 216, 0.16);
+  --c-grad-primary: linear-gradient(135deg, #6b8cf5 0%, #3d63d2 100%);
+  --c-grad-primary-hover: linear-gradient(135deg, #5c7de9 0%, #3354bd 100%);
+  --c-grad-soft: linear-gradient(135deg, #eef3ff 0%, #f6f0ff 100%);
+  --c-grad-side: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+  --c-grad-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
+
+  /* ---------- 语义色 ---------- */
+  --c-accent: #dca046;
+  --c-accent-weak: #fff5e4;
+  --c-danger: #d5585b;
+  --c-danger-weak: #fdecee;
+  --c-success: #37936c;
+  --c-success-weak: #e7f7ef;
+  --c-warn: #c9862f;
+
+  /* ---------- 圆角 ---------- */
+  --r-xs: 5px;
+  --r-s: 8px;
+  --r-m: 12px;
+  --r-l: 18px;
+  --r-pill: 999px;
+
+  /* ---------- 阴影（分层，越高越柔） ---------- */
+  --sh-1: 0 1px 2px rgba(23, 32, 53, 0.04), 0 1px 1px rgba(23, 32, 53, 0.03);
+  --sh-2: 0 4px 14px rgba(23, 32, 53, 0.07), 0 1px 3px rgba(23, 32, 53, 0.05);
+  --sh-3: 0 18px 48px rgba(23, 32, 53, 0.16), 0 4px 12px rgba(23, 32, 53, 0.07);
+  --sh-primary: 0 6px 16px rgba(63, 104, 216, 0.26);
+  --sh-inset: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  --sh-card: 0 1px 2px rgba(23, 32, 53, 0.035), 0 6px 18px rgba(23, 32, 53, 0.035);
+  --sh-focus: 0 0 0 3px var(--c-primary-ring);
+
+  /* ---------- 材质（半透明玻璃 / 面板高光 / 标记）
+   * 这些值在浅色下接近白色，深色下必须整体翻转，
+   * 统一走变量，避免组件里散落 rgba(255,255,255,...) 造成深色斑点。 */
+  --c-glass: rgba(255, 255, 255, 0.84);
+  --c-glass-2: rgba(255, 255, 255, 0.78);
+  --c-glass-3: rgba(255, 255, 255, 0.94);
+  --c-panel-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(249, 251, 255, 0.42));
+  --c-panel-top: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(160, 182, 235, 0.16) 45%, rgba(255, 255, 255, 0.9));
+  --c-tag-ring: rgba(255, 255, 255, 0.85);
+  --c-mark-bg: #ffe58a;
+  --c-mark-fg: #172035;
+  --c-soft-hover: #dfe9ff;
+  --c-switch-knob: #ffffff;
+  --c-code-bg: #1f2530;
+  --c-code-fg: #c9d6e8;
+  --c-toast-bg: rgba(24, 33, 54, 0.95);
+  --c-toast-border: rgba(255, 255, 255, 0.1);
+  --c-tooltip-bg: rgba(24, 33, 54, 0.94);
+
+  /* ---------- 间距 ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+
+  /* ---------- 字号 ---------- */
+  --fs-2xs: 10px;
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-md: 13px;
+  --fs-lg: 15px;
+  --fs-xl: 20px;
+  --fs-xxl: 26px;
+
+  /* ---------- 动效 ---------- */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.42, 0.64, 1);
+  --dur: 0.18s;
+  --dur-slow: 0.32s;
+
+  /* ---------- 尺寸 ---------- */
+  --titlebar-h: 40px;
+  --sidebar-w: 230px;
+  /* 桌面为 0；≤640px 时切成 58px，给底部标签栏让出空间 */
+  --tabbar-h: 0px;
+
+  --font-ui: 'Segoe UI Variable Display', 'Segoe UI', -apple-system,
+    BlinkMacSystemFont, 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  --font-read: Georgia, 'Songti SC', 'SimSun', serif;
+}
+
+/* ================================================================ 深色外观
+ * 只覆盖「颜色 / 材质 / 阴影」，圆角、间距、字号、动效、尺寸全部沿用，
+ * 因此浅色与深色的布局与节奏严格一致，换肤不会引起任何跳动。
+ * 阅读器的 --r-* / --nr-* 是独立体系，不受这里影响。
+ * ================================================================ */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --c-bg: #11141b;
+  --c-bg-grad: radial-gradient(1100px 620px at 8% -12%, rgba(56, 84, 158, 0.16) 0%, transparent 60%),
+    radial-gradient(900px 560px at 102% 104%, rgba(104, 76, 158, 0.14) 0%, transparent 58%),
+    radial-gradient(620px 420px at 52% 48%, rgba(255, 255, 255, 0.018), transparent 70%);
+  --c-surface: #1a1f29;
+  --c-surface-2: #161a22;
+  --c-surface-3: #242b37;
+  --c-surface-hover: #202734;
+  --c-border: #2b3340;
+  --c-border-strong: #3b4656;
+  --c-border-soft: #222935;
+
+  --c-text: #e9edf6;
+  --c-text-2: #aeb9cb;
+  --c-text-3: #7a8598;
+
+  --c-primary: #8aa6ff;
+  --c-primary-2: #a6baff;
+  --c-primary-hover: #a0b6ff;
+  --c-primary-weak: rgba(96, 132, 235, 0.18);
+  --c-primary-ring: rgba(124, 156, 255, 0.26);
+  --c-grad-primary: linear-gradient(135deg, #6f8ef0 0%, #4767cf 100%);
+  --c-grad-primary-hover: linear-gradient(135deg, #7c99f5 0%, #5271dc 100%);
+  --c-grad-soft: linear-gradient(135deg, rgba(86, 116, 205, 0.2) 0%, rgba(133, 97, 196, 0.18) 100%);
+  --c-grad-side: linear-gradient(180deg, #1a1f29 0%, #151821 100%);
+  --c-grad-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+
+  --c-accent: #e5b065;
+  --c-accent-weak: rgba(220, 160, 70, 0.15);
+  --c-danger: #f08184;
+  --c-danger-weak: rgba(213, 88, 91, 0.16);
+  --c-success: #63cfa0;
+  --c-success-weak: rgba(55, 147, 108, 0.18);
+  --c-warn: #e0ac5c;
+
+  --sh-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 1px rgba(0, 0, 0, 0.24);
+  --sh-2: 0 4px 14px rgba(0, 0, 0, 0.36), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --sh-3: 0 18px 48px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.4);
+  --sh-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 18px rgba(0, 0, 0, 0.28);
+  --sh-inset: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --sh-focus: 0 0 0 3px var(--c-primary-ring);
+
+  --c-glass: rgba(21, 25, 33, 0.86);
+  --c-glass-2: rgba(21, 25, 33, 0.78);
+  --c-glass-3: rgba(26, 31, 41, 0.94);
+  --c-panel-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.012));
+  --c-panel-top: linear-gradient(90deg, rgba(255, 255, 255, 0.12), rgba(140, 165, 235, 0.06) 45%, rgba(255, 255, 255, 0.08));
+  --c-tag-ring: rgba(17, 20, 27, 0.9);
+  --c-mark-bg: #6b5826;
+  --c-mark-fg: #f7ebc4;
+  --c-soft-hover: rgba(96, 132, 235, 0.26);
+  --c-switch-knob: #e9edf6;
+  --c-code-bg: #0e1117;
+  --c-code-fg: #b9c8dd;
+  --c-toast-bg: rgba(10, 13, 19, 0.96);
+  --c-toast-border: rgba(255, 255, 255, 0.08);
+  --c-tooltip-bg: rgba(10, 13, 19, 0.96);
+}
+
+/* ---------------------------------------------------------------- 紧凑布局
+ * 窗口收窄时侧栏自动收成图标栏，把宽度还给内容区。
+ * 用全局媒体查询是因为 --sidebar-w 是 :root 变量，scoped 样式改不到。
+ * 图标的文字由组件内的 CSS tooltip（attr(data-label)）补足，不是单纯藏掉。 */
+@media (max-width: 1180px) {
+  :root {
+    --sidebar-w: 68px;
+  }
+}
+
+/* ≤640px：侧栏退场，改由 App.vue 的底部标签栏承担导航 */
+@media (max-width: 640px) {
+  :root {
+    --sidebar-w: 0px;
+    --tabbar-h: 58px;
+    --titlebar-h: 38px;
+  }
+}

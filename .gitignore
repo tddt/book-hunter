@@ -1,0 +1,20 @@
+node_modules/
+out/
+dist/
+.build-tmp/
+# build/ 是 electron-builder 的 buildResources：任何 icon.* 都会被自动发现并
+# 触发 rcedit 改写 exe，导致本机 NSIS 打包不稳定。图标统一放 assets/。
+build/*.ico
+build/*.png
+*.log
+.DS_Store
+.env
+.env.local
+.vite/
+*.tsbuildinfo
+
+# electron-vite 运行时生成的临时配置（内嵌本机绝对路径，不可入库）
+electron.vite.config.*.mjs
+
+# 本机项目工作日志 / 助手数据，属于本地资料，不随源码公开
+.workbuddy/

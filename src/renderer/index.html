@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      自研阅读引擎不再用 epub.js 的 blob iframe / eval，CSP 已收紧：
+      - script-src 只放行同源，无 unsafe-eval / unsafe-inline；
+      - connect-src 不再放行任意 https（联网元数据由主进程发起，不受渲染层 CSP 约束）；
+      - style-src 的 unsafe-inline 需保留，Vue 的 :style 绑定依赖它；
+      - book: 是书库封面自定义协议，blob: 是 EPUB 内图片资源。
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' blob: data:; img-src 'self' data: blob: book:; font-src 'self' data: blob:; frame-src 'self' blob: data:; connect-src 'self' blob: data:;"
+    />
+    <title>书猎 · EPUB 搜索与阅读</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
