@@ -385,7 +385,10 @@ code { padding: 1px 5px; border-radius: 3px; background: var(--c-surface-3); }
 .muted { opacity: .62; }
 
 @media (max-width: 640px) {
-  .online-view { padding: 14px 12px 0; }
+  /* 窄屏 hero 折行会占掉大半屏，若仍让 .results 用 flex:1 抢剩余高度，
+     grid 的 auto 行会被压到 30px 上下、书卡内容全被裁掉。
+     改为整页滚动 + 书卡保底高度；桌面宽度布局完全不动。 */
+  .online-view { padding: 14px 12px 12px; overflow-x: hidden; overflow-y: auto; }
   .hero h1 { font-size: 22px; }
   .hero > p { margin-bottom: 10px; }
   .search-box { height: 44px; padding-left: 12px; gap: 7px; }
@@ -398,8 +401,12 @@ code { padding: 1px 5px; border-radius: 3px; background: var(--c-surface-3); }
   .source-panel { max-height: 170px; }
   .tool-row { flex-wrap: wrap; }
   .tool-row .input.wide { flex: 1 1 100%; }
-  .results { grid-template-columns: 1fr; gap: 9px; padding: 10px 0 20px; }
-  .book-card { min-height: 0; padding: 10px; }
+  .results {
+    flex: none; min-height: 0; overflow: visible;
+    grid-template-columns: 1fr; grid-auto-rows: minmax(132px, auto);
+    gap: 9px; padding: 10px 0 20px;
+  }
+  .book-card { min-height: 132px; padding: 10px; }
   .cover { width: 58px; height: 82px; }
   .j-title { max-width: 110px; }
   .j-bar { width: 60px; }
