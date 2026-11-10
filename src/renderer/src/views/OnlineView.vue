@@ -403,11 +403,17 @@ code { padding: 1px 5px; border-radius: 3px; background: var(--c-surface-3); }
   .tool-row .input.wide { flex: 1 1 100%; }
   .results {
     flex: none; min-height: 0; overflow: visible;
-    grid-template-columns: 1fr; grid-auto-rows: minmax(132px, auto);
+    /* 必须写 minmax(0, 1fr)：裸 1fr 的下限是 min-content，.b-foot 里两个
+       nowrap 按钮会把轨道撑到 490px，超出容器后被 .online-view 的
+       overflow-x:hidden 裁掉「详情 / 下载并入库」。桌面端用 minmax(330px,1fr)
+       有明确下限，不受影响。 */
+    grid-template-columns: minmax(0, 1fr); grid-auto-rows: minmax(132px, auto);
     gap: 9px; padding: 10px 0 20px;
   }
-  .book-card { min-height: 132px; padding: 10px; }
+  .book-card { min-height: 132px; min-width: 0; padding: 10px; }
   .cover { width: 58px; height: 82px; }
+  /* 极窄窗口（360px 起）再留一层兜底：通道数文案与按钮可换行，绝不横向溢出 */
+  .b-foot { flex-wrap: wrap; }
   .j-title { max-width: 110px; }
   .j-bar { width: 60px; }
 }
