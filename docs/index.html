@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>书猎 Book Hunter — 搜得到、导得进、读得舒服</title>
+<meta name="description" content="书猎是一款本地优先的 Windows 桌面电子书管理与阅读器。EPUB / MOBI / AZW3 / PDF / TXT 统一入库，共用自研排版引擎、全文检索与正文内对照翻译。无需账号，书和笔记都留在自己的磁盘上。MIT 开源。">
+<meta name="author" content="tddt">
+<meta property="og:type" content="website">
+<meta property="og:title" content="书猎 Book Hunter — 本地优先的电子书库与阅读器">
+<meta property="og:description" content="五种格式，一套阅读体验。全文检索跳页、自研中文排版、正文内对照翻译，全部数据留在本地。">
+<meta property="og:url" content="https://tddt.github.io/book-hunter/">
+<meta property="og:image" content="https://tddt.github.io/book-hunter/screenshots/shelf-dark.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#14171e">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23b4482f'/%3E%3Ctext x='32' y='45' font-size='38' text-anchor='middle' fill='%23fff' font-family='serif'%3E%E7%8C%8E%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --paper:#f6f3ec; --paper-2:#fffdf8; --ink:#1b1d23; --ink-2:#3d414a;
+  --muted:#6f7279; --line:#e3ddd0; --dark:#14171e; --dark-2:#1d212a;
+  --accent:#b4482f; --accent-soft:#f2e4de; --gold:#a8843f;
+  --shadow:0 18px 50px rgba(24,26,32,.10);
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.75;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+  background-image:radial-gradient(rgba(120,105,80,.055) .6px,transparent .6px);background-size:5px 5px}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+.wrap{width:min(1140px,calc(100% - 48px));margin:0 auto;position:relative;z-index:1}
+.mono{font-family:var(--mono)}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.18em;color:var(--accent);font-weight:700;text-transform:uppercase}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--accent)}
+.eyebrow.light{color:#d9a48c}
+.eyebrow.light::before{background:#d9a48c}
+h1,h2,h3{line-height:1.28;letter-spacing:-.02em;margin:0}
+.section{padding:96px 0}
+.section-head{max-width:660px;margin-bottom:48px}
+.section-head h2{font-size:clamp(28px,3.6vw,42px);margin:16px 0 14px}
+.section-head p{color:var(--muted);font-size:16px;margin:0}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(246,243,236,.86);backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .25s,box-shadow .25s}
+.nav.scrolled{border-color:var(--line);box-shadow:0 6px 24px rgba(20,23,30,.05)}
+.nav .wrap{display:flex;align-items:center;height:66px;gap:36px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:17px;letter-spacing:.02em;flex:none}
+.seal{width:32px;height:32px;border-radius:7px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:18px;font-family:serif;box-shadow:0 3px 10px rgba(180,72,47,.28)}
+.brand small{font-weight:500;color:var(--muted);font-size:12px;letter-spacing:.08em;margin-left:2px}
+.nav-links{display:flex;gap:26px;margin-left:auto;font-size:14px;color:var(--ink-2)}
+.nav-links a:hover{color:var(--accent)}
+.nav .btn-gh{flex:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:12px 20px;border-radius:9px;font-size:14px;font-weight:650;transition:transform .18s,box-shadow .18s,background .18s;border:1px solid transparent;cursor:pointer}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 8px 22px rgba(180,72,47,.24)}
+.btn-primary:hover{box-shadow:0 12px 28px rgba(180,72,47,.32)}
+.btn-ghost{border-color:var(--line);background:var(--paper-2);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--ink-2)}
+.btn-outline{border-color:rgba(255,255,255,.28);color:#f3efe7;background:rgba(255,255,255,.03)}
+.btn-outline:hover{border-color:rgba(255,255,255,.6)}
+.btn-sm{padding:9px 15px;font-size:13px}
+.btn svg{width:16px;height:16px;flex:none}
+
+/* hero */
+.hero{background:var(--dark);color:#f4f1e9;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;width:760px;height:760px;right:-180px;top:-320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(180,72,47,.20),rgba(180,72,47,0) 66%)}
+.hero::after{content:"";position:absolute;width:520px;height:520px;left:-260px;bottom:-300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(168,132,63,.13),rgba(168,132,63,0) 68%)}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.02fr);gap:64px;align-items:center;padding-top:88px;padding-bottom:98px}
+.hero h1{font-size:clamp(42px,5.4vw,68px);font-weight:800;letter-spacing:-.045em;margin:22px 0 24px}
+.hero h1 em{font-style:normal;color:#e8a58c;position:relative}
+.hero h1 em::after{content:"";position:absolute;left:0;right:0;bottom:2px;height:9px;background:rgba(180,72,47,.38);z-index:-1;border-radius:2px}
+.hero .lede{font-size:17px;line-height:1.9;color:#b9bcc4;max-width:490px;margin:0 0 34px}
+.hero .lede strong{color:#f0ece3;font-weight:600}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:28px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:22px;font-size:12.5px;color:#858a94;letter-spacing:.02em}
+.hero-meta span{display:flex;align-items:center;gap:7px}
+.hero-meta i{width:5px;height:5px;border-radius:50%;background:var(--gold);display:block}
+.window{border-radius:12px;overflow:hidden;background:#20242d;border:1px solid rgba(255,255,255,.09);box-shadow:0 34px 90px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.03);transform:perspective(1400px) rotateY(-5deg) rotateX(1deg)}
+.window-bar{height:34px;background:#282d37;display:flex;align-items:center;gap:7px;padding:0 14px;border-bottom:1px solid rgba(255,255,255,.06)}
+.window-bar i{width:9px;height:9px;border-radius:50%;background:#4a505c}
+.window-bar i:first-child{background:#c06a54}.window-bar i:nth-child(2){background:#b79a55}.window-bar i:nth-child(3){background:#5e8a70}
+.window-bar span{margin-left:10px;font-size:11px;color:#8a909b;letter-spacing:.05em}
+.window img{width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top left}
+
+/* format strip */
+.strip{background:var(--paper-2);border-bottom:1px solid var(--line);padding:26px 0}
+.strip .wrap{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.fmt{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--ink-2);padding:7px 13px;border:1px solid var(--line);border-radius:7px;background:#fff;letter-spacing:.02em}
+.strip .arrow{color:var(--accent);display:flex;align-items:center}
+.strip .arrow svg{width:20px;height:20px}
+.strip .result{padding:7px 15px;border-radius:7px;background:var(--ink);color:#fff;font-size:12.5px;font-weight:650}
+.strip .note{width:100%;text-align:center;color:var(--muted);font-size:12.5px;margin:2px 0 0}
+
+/* feature cards */
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.card{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:28px 26px 30px;transition:transform .2s,box-shadow .2s,border-color .2s}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:#d3c9b6}
+.card .num{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.08em}
+.card h3{font-size:19px;margin:14px 0 10px}
+.card p{color:var(--muted);font-size:14px;line-height:1.85;margin:0}
+.card .tag{display:inline-block;margin-top:16px;font-size:11.5px;color:var(--ink-2);background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:4px 10px}
+
+/* engine */
+.engine{background:var(--dark-2);color:#eeeae1;position:relative;overflow:hidden}
+.engine .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:70px;align-items:center}
+.engine h2{font-size:clamp(28px,3.6vw,42px);margin:16px 0 18px}
+.engine p{color:#a8adb7;font-size:15px;line-height:1.95;margin:0 0 18px}
+.engine .kv{display:flex;gap:28px;margin-top:30px;flex-wrap:wrap}
+.engine .kv div{border-left:2px solid var(--accent);padding-left:14px}
+.engine .kv b{display:block;font-size:19px;font-family:var(--mono);color:#f0ece3}
+.engine .kv span{font-size:12px;color:#8c919b}
+.spread{display:flex;gap:14px;justify-content:center;perspective:1000px}
+.page{width:min(210px,44%);aspect-ratio:3/4.3;background:#f7f3e9;border-radius:3px;padding:26px 22px;box-shadow:0 20px 50px rgba(0,0,0,.4);position:relative;transform:rotateY(6deg)}
+.page:first-child{transform:rotateY(-6deg)}
+.page .block{height:100%;border:1px dashed rgba(180,72,47,.45);padding:14px 12px;display:flex;flex-direction:column;gap:9px}
+.page .l{height:6px;border-radius:3px;background:#d8d2c2}
+.page .l.short{width:62%}.page .l.mid{width:84%}
+.page .l.hl{background:var(--accent);opacity:.55}
+.page .pg{position:absolute;bottom:9px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:10px;color:#9a9588}
+.engine .progress{margin-top:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:14px 16px;font-size:12px;color:#9da2ac}
+.engine .progress .bar{height:5px;background:rgba(255,255,255,.1);border-radius:4px;margin-top:10px;overflow:hidden}
+.engine .progress .bar i{display:block;width:43%;height:100%;background:var(--accent);border-radius:4px}
+.engine .progress b{color:#f0ece3;font-family:var(--mono)}
+
+/* gallery */
+.shots{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px}
+.shot{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.shot:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.shot img{width:100%;height:100%;object-fit:cover;background:#20242d}
+.shot.big img{aspect-ratio:16/10;object-position:top left}
+.shot.small{display:grid;grid-template-rows:1fr 1fr;gap:2px;background:var(--line)}
+.shot.small img{aspect-ratio:16/8.7;object-position:top left}
+.shot-cap{padding:13px 16px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line)}
+.shot.small .shot-cap{grid-column:1;background:var(--paper-2)}
+.gallery-note{margin-top:18px;font-size:13px;color:var(--muted)}
+
+/* limits */
+.limits{background:var(--paper-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.limits .wrap{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:60px;align-items:start}
+.limits h2{font-size:clamp(26px,3.2vw,36px);margin:16px 0 14px}
+.limits > .wrap > div > p{color:var(--muted);font-size:15px;margin:0}
+.limit-list{display:grid;gap:2px}
+.limit{display:flex;gap:14px;padding:15px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.8}
+.limit:last-child{border-bottom:0}
+.limit .x{flex:none;width:20px;height:20px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:12px;font-weight:800;margin-top:3px}
+.limit b{font-weight:650}
+.limit span{color:var(--muted)}
+
+/* start */
+.start .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:60px;align-items:center}
+.code{background:var(--dark);color:#dfe2e8;border-radius:12px;padding:24px 26px;font-family:var(--mono);font-size:13px;line-height:2;overflow-x:auto;box-shadow:var(--shadow)}
+.code .c{color:#7e8591}.code .k{color:#e8a58c}.code .s{color:#a9c396}
+.copy-row{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.copy-row button{background:none;border:1px solid var(--line);border-radius:7px;padding:6px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:var(--sans)}
+.copy-row button:hover{color:var(--accent);border-color:var(--accent)}
+.data-box{margin-top:22px;background:var(--paper-2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 10px 10px 0;padding:15px 18px;font-size:13.5px;color:var(--ink-2)}
+.data-box code{font-family:var(--mono);font-size:12.5px;background:var(--paper);padding:2px 6px;border-radius:4px}
+
+/* faq */
+.faq{background:var(--paper-2);border-top:1px solid var(--line)}
+.faq-list{max-width:820px;margin:0 auto}
+details{border-bottom:1px solid var(--line)}
+details:first-child{border-top:1px solid var(--line)}
+summary{cursor:pointer;list-style:none;padding:20px 34px 20px 0;position:relative;font-weight:650;font-size:15.5px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:20px;font-weight:300;color:var(--accent);transition:transform .2s}
+details[open] summary::after{transform:translateY(-50%) rotate(45deg)}
+details p{color:var(--muted);font-size:14px;line-height:1.95;margin:0 0 22px;max-width:740px}
+
+/* cta */
+.final{background:var(--dark);color:#f4f1e9;text-align:center;position:relative;overflow:hidden}
+.final::before{content:"";position:absolute;width:620px;height:620px;left:50%;top:-420px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(180,72,47,.22),transparent 68%)}
+.final .wrap{padding:88px 0 92px}
+.final h2{font-size:clamp(28px,3.8vw,44px);margin:18px 0 16px}
+.final p{color:#a8adb7;font-size:16px;margin:0 auto 32px;max-width:560px}
+.final .hero-cta{justify-content:center}
+.final .fine{font-size:12px;color:#727782;margin-top:26px}
+
+footer{background:#0f1116;color:#7e838d;padding:30px 0;font-size:12.5px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer a:hover{color:#e8a58c}
+footer .links{display:flex;gap:20px}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media (max-width:980px){
+  /* 1fr == minmax(auto,1fr)：子项 min-content 会撑宽列，手机上必须显式归零 */
+  .hero .wrap{grid-template-columns:minmax(0,1fr);gap:48px;padding-top:64px;padding-bottom:70px}
+  .window{transform:none;max-width:640px}
+  .hero .lede{max-width:640px}
+  .engine .wrap,.limits .wrap,.start .wrap{grid-template-columns:minmax(0,1fr);gap:38px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .spread{max-width:460px}
+}
+@media (max-width:680px){
+  .wrap{width:min(calc(100% - 32px),1140px)}
+  .hero .wrap>div,.engine .wrap>div,.limits .wrap>div,.start .wrap>div{min-width:0}
+  .section{padding:64px 0}
+  .nav .wrap{height:58px;gap:14px}
+  .nav-links{display:none}
+  .brand small{display:none}
+  .hero h1{font-size:clamp(38px,10vw,52px)}
+  .hero .lede{max-width:100%;font-size:15px}
+  .hero-cta{flex-direction:column;align-items:stretch}
+  .hero-cta .btn{width:100%}
+  .hero-meta{gap:10px 18px}
+  .window{max-width:100%;width:100%}
+  .grid,.shots{grid-template-columns:minmax(0,1fr)}
+  .shot.small{grid-template-rows:auto}
+  .card{padding:22px 20px 24px}
+  .strip .wrap{gap:9px}
+  .fmt{font-size:11px;padding:6px 9px}
+  .page{padding:18px 14px}
+  .final .wrap{padding:64px 0}
+  footer .wrap{flex-direction:column}
+}
+@media (prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a href="#top" class="brand"><span class="seal">猎</span>书猎 <small>BOOK HUNTER</small></a>
+    <nav class="nav-links">
+      <a href="#features">特性</a>
+      <a href="#engine">排版引擎</a>
+      <a href="#shots">界面</a>
+      <a href="#limits">边界</a>
+      <a href="#faq">常见问题</a>
+    </nav>
+    <a class="btn btn-ghost btn-sm btn-gh" href="https://github.com/tddt/book-hunter" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.58.23 2.75.11 3.04.74.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
+      GitHub
+    </a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow light">MIT 开源 · 本地优先 · Windows</span>
+        <h1>搜得到，<br>导得进，<br><em>读得舒服</em></h1>
+        <p class="lede">书猎是一款本地优先的桌面电子书库与阅读器。<strong>EPUB / MOBI / AZW3 / PDF / TXT 统一入库</strong>，共用一套自研排版引擎、全文检索与正文内对照翻译。书和笔记都留在自己的磁盘上。</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="https://github.com/tddt/book-hunter/releases/latest" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            下载 Windows 版
+          </a>
+          <a class="btn btn-outline" href="https://github.com/tddt/book-hunter" target="_blank" rel="noopener">
+            在 GitHub 上查看
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+        <div class="hero-meta">
+          <span><i></i>不需要账号</span>
+          <span><i></i>不依赖云端</span>
+          <span><i></i>零原生模块</span>
+          <span><i></i>五种格式统一体验</span>
+        </div>
+      </div>
+      <div class="window">
+        <div class="window-bar"><i></i><i></i><i></i><span>书猎 · 我的书架</span></div>
+        <img src="screenshots/shelf-dark.jpg" alt="书猎深色主题书架：封面墙、分类筛选与阅读进度">
+      </div>
+    </div>
+  </section>
+
+  <!-- FORMAT STRIP -->
+  <div class="strip">
+    <div class="wrap">
+      <span class="fmt">.epub</span><span class="fmt">.mobi</span><span class="fmt">.azw3</span><span class="fmt">.pdf</span><span class="fmt">.txt</span>
+      <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+      <span class="result">导入时归一化为标准 EPUB</span>
+      <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+      <span class="result" style="background:var(--accent)">只有一条阅读链路</span>
+      <p class="note">目录、页码、进度、检索、划线、笔记 —— 五种格式完全一样，不是五个各凑合一下的阅读器。</p>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">WHAT IT DOES</span>
+        <h2>把「管书」和「读书」放进同一处</h2>
+        <p>不追求功能清单最长，只解决一件事：硬盘里明明有几百本书，却总没有一个愿意在里面把书读完的地方。</p>
+      </div>
+      <div class="grid">
+        <article class="card reveal"><span class="num">01 / 五种格式，一套体验</span><h3>导入即归一</h3><p>非 EPUB 格式在导入时转成标准 EPUB 并回喂解析器做结构自校验，绝不写出「能写不能读」的文件。单文件、多文件、整文件夹递归、拖拽、双击 .epub 自动导入，SHA1 去重。</p><span class="tag">NormalizedBook → buildEpub()</span></article>
+        <article class="card reveal"><span class="num">02 / 自研排版引擎</span><h3>版心由自己算</h3><p>不依赖 epub.js。CSS 多列分页几何让版心居中、宽屏双页不裁字，跨章翻页自动归零重排；真实页码与按字数加权的全书进度分开计算，翻页有方向一致的动画。</p><span class="tag">NativeReaderEngine</span></article>
+        <article class="card reveal"><span class="num">03 / 真·全文检索</span><h3>跳到那一页</h3><p>书名、作者、出版社、分类、标签走倒排索引（毫秒级）；整本正文走可中断的流式扫描。命中片段点一下，直接落到它所在的那一页并高亮。</p><span class="tag">MiniSearch + 流式扫描</span></article>
+        <article class="card reveal"><span class="num">04 / 沉浸式阅读</span><h3>界面懂得让开</h3><p>工具栏默认隐藏，鼠标移到边缘才浮现。5 套纸张主题，字号、行距、段距、版心宽度可调；目录、书签、5 色划线、笔记、书内搜索、全屏与快捷键，关闭重开回到上次位置。</p><span class="tag">浅色 / 深色 / 跟随系统</span></article>
+        <article class="card reveal"><span class="num">05 / 正文内对照翻译</span><h3>译文跟着原文翻页</h3><p>译文按段落注入正文，与原文共用版心、字号、行距和翻页，而不是挤在侧边小字抽屉里。三态切换、15 种目标语言、第二对照语言、划词翻译，译文落盘后离线可读。</p><span class="tag">原文 + 译文 / 仅译文 / 仅原文</span></article>
+        <article class="card reveal"><span class="num">06 / 整理与找书</span><h3>书库是自己的</h3><p>分类树、多标签、收藏、阅读状态、评分、网格 / 列表视图；聚合 Gutenberg、Gutendex、Standard Ebooks、Open Library、Internet Archive 五个公版书源，支持自定义 OPDS 与 EPUB 直链。</p><span class="tag">全部数据在 %APPDATA%\书猎\library\</span></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ENGINE -->
+  <section class="section engine" id="engine">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="eyebrow light">THE READING ENGINE</span>
+        <h2>为什么连排版引擎都自己写</h2>
+        <p>中文版心、宽屏双页不裁字、以及一个能让人相信的「读到全书 43%」，都要求对分页几何有完全的控制。于是没有用现成方案：EPUB 解压、章节 HTML 清洗、CSS 多列分页、跨章方向处理、页码与进度映射，全部自己算。</p>
+        <p>代价是所有排版边界都要自己维护（README 里如实列了退化场景），换来的是五种格式在同一个版心里读起来一模一样。</p>
+        <div class="kv">
+          <div><b>CSS Columns</b><span>原生分页，不虚拟滚动</span></div>
+          <div><b>0</b><span>原生编译依赖</span></div>
+          <div><b>5</b><span>套纸张主题</span></div>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="spread">
+          <div class="page"><div class="block"><span class="l"></span><span class="l short"></span><span class="l mid"></span><span class="l"></span><span class="l mid"></span><span class="l hl"></span><span class="l"></span><span class="l short"></span><span class="l mid"></span><span class="l"></span></div><span class="pg">— 128 —</span></div>
+          <div class="page"><div class="block"><span class="l mid"></span><span class="l"></span><span class="l short"></span><span class="l"></span><span class="l mid"></span><span class="l"></span><span class="l short"></span><span class="l mid"></span><span class="l"></span><span class="l short"></span></div><span class="pg">— 129 —</span></div>
+        </div>
+        <div class="progress">全书进度（按章节字数加权）<b>43.2%</b><div class="bar"><i></i></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="section" id="shots">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">SCREENSHOTS</span>
+        <h2>长什么样</h2>
+        <p>深色主题下的书架、格式工具，以及窗口收窄到手机宽度时的响应式布局。</p>
+      </div>
+      <div class="shots reveal">
+        <figure class="shot big" style="margin:0">
+          <img src="screenshots/shelf-dark.jpg" alt="深色主题书架，封面墙与阅读进度">
+          <figcaption class="shot-cap">书架 · 封面墙、分类筛选、阅读进度</figcaption>
+        </figure>
+        <div style="display:grid;grid-template-rows:1fr 1fr;gap:18px;min-width:0">
+          <figure class="shot" style="margin:0">
+            <img src="screenshots/tools-dark.png" alt="TXT 转 EPUB 格式工具">
+            <figcaption class="shot-cap">格式工具 · 多个 TXT 合并 / 单独转 EPUB</figcaption>
+          </figure>
+          <figure class="shot" style="margin:0">
+            <img src="screenshots/mobile-dark.jpg" alt="窄窗口下切换为底部标签栏">
+            <figcaption class="shot-cap">窄窗口 · 自动切换底部标签栏</figcaption>
+          </figure>
+        </div>
+      </div>
+      <p class="gallery-note reveal">格式为 Electron 桌面应用，当前打包目标为 Windows；窄窗口布局是响应式界面，不是 Android / iOS 版本。</p>
+    </div>
+  </section>
+
+  <!-- LIMITS -->
+  <section class="section limits" id="limits">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="eyebrow">HONEST LIMITS</span>
+        <h2>也有不做的</h2>
+        <p>把边界写清楚，比多写三条卖点更重要。下面这些是当前版本确实做不到、或不打算做的事。</p>
+      </div>
+      <div class="limit-list reveal">
+        <div class="limit"><span class="x">×</span><div><b>不加载 EPUB 原书样式表</b> <span>—— 为保证版心统一，特殊诗歌 / 表格排版会退化为通用排版。</span></div></div>
+        <div class="limit"><span class="x">×</span><div><b>PDF 不保留原版式</b> <span>—— 只抽文本层，扫描版需先 OCR；追求原版式请直接用 PDF 阅读器。</span></div></div>
+        <div class="limit"><span class="x">×</span><div><b>不支持 DRM 与 KFX</b> <span>—— MOBI 仅处理 MOBI6 / KF8，不绕过任何鉴权或付费墙。</span></div></div>
+        <div class="limit"><span class="x">×</span><div><b>只收公版书</b> <span>—— 在线书源限定公有领域或明确免费授权的内容，不接盗版源。</span></div></div>
+        <div class="limit"><span class="x">×</span><div><b>不是手机 App</b> <span>—— 「手机布局」指窗口 ≤640px 的响应式界面，不含移动端打包与触摸翻页。</span></div></div>
+        <div class="limit"><span class="x">×</span><div><b>翻译通道有额度限制</b> <span>—— 用免费公开接口，遵守服务方条款；可换自建 LibreTranslate 端点。</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- START -->
+  <section class="section start" id="start">
+    <div class="wrap">
+      <div class="section-head reveal" style="margin-bottom:26px">
+        <span class="eyebrow">GET STARTED</span>
+        <h2>两种开始方式</h2>
+        <p>直接下载预编译安装包，或从源码自己构建。环境要求 Node.js 20+、pnpm 9+。</p>
+      </div>
+      <div class="reveal">
+        <div class="code" id="codeblock"><span class="c"># 从源码构建</span>
+pnpm install
+pnpm dev            <span class="c"># 开发运行</span>
+pnpm build          <span class="c"># 构建三层</span>
+pnpm dist:dir       <span class="c"># 免安装目录</span>
+pnpm dist:win       <span class="c"># 安装版 + 便携版</span></div>
+        <div class="copy-row"><span style="font-size:12px;color:var(--muted)">完整取舍与目录树见仓库 docs/DEVELOPMENT.md</span><button type="button" id="copyBtn">复制命令</button></div>
+      </div>
+      <div class="reveal">
+        <div class="data-box">所有书目、进度、书签、笔记与译文缓存都在 <code>%APPDATA%\书猎\library\</code>。<strong>备份这一个目录即可完整迁移</strong>；删除书籍默认只移除书库记录，不动原文件。</div>
+        <div style="margin-top:26px;display:flex;gap:12px;flex-wrap:wrap">
+          <a class="btn btn-primary" href="https://github.com/tddt/book-hunter/releases/latest" target="_blank" rel="noopener">获取最新安装包</a>
+          <a class="btn btn-ghost" href="https://github.com/tddt/book-hunter#readme" target="_blank" rel="noopener">阅读 README</a>
+        </div>
+        <p style="margin-top:18px;font-size:12.5px;color:var(--muted)">安装包只关联 .epub，不抢占系统里 PDF / TXT 的默认打开方式。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section faq" id="faq">
+    <div class="wrap">
+      <div class="section-head reveal" style="text-align:center;margin-left:auto;margin-right:auto">
+        <span class="eyebrow" style="justify-content:center">FAQ</span>
+        <h2>可能被问到的</h2>
+      </div>
+      <div class="faq-list reveal">
+        <details open><summary>书和笔记会被上传吗？</summary><p>不会。应用不需要账号，书目、进度、书签、笔记和译文缓存全部保存在本地 <code>%APPDATA%\书猎\library\</code>，网络只用于你主动发起的在线取书和翻译请求。备份这一个目录即可完整迁移。</p></details>
+        <details><summary>支持哪些格式？PDF 效果如何？</summary><p>EPUB 原生入库；MOBI / AZW3 / PDF / TXT 导入时统一转成标准 EPUB，因此共用同一套目录、进度、检索与标注。PDF 只抽取文本层，保留文字与图片但不保留原版式，扫描版需要先做 OCR。MOBI 支持 MOBI6 / KF8，不支持 DRM 与 KFX。</p></details>
+        <details><summary>「在线取书」的书从哪来？有盗版吗？</summary><p>聚合 Project Gutenberg、Gutendex、Standard Ebooks、Open Library、Internet Archive 五个公版书源，也支持自定义 OPDS 目录和 EPUB 直链。只收录公有领域或明确免费授权的内容，不接盗版源、不绕过登录或付费墙。内置书源以英文公版书为主。</p></details>
+        <details><summary>有手机版吗？</summary><p>目前没有。窗口收窄到 ≤640px 时界面会自动切换成底部标签栏的响应式布局，但项目不含 Android / iOS 打包，也没有触摸翻页手势。</p></details>
+        <details><summary>对照翻译稳定吗？断网还能看吗？</summary><p>仅使用面向公众免费开放、无需 API Key 的接口，有额度与频率限制，可用自建 LibreTranslate 端点替代。译文会落盘缓存，缓存过后离线可读；译文质量与可用性由各服务方决定。</p></details>
+        <details><summary>为什么不用 epub.js？</summary><p>中文版心、宽屏双页不裁字、真实页码与按字数加权的全书进度，需要对分页几何有完全控制，所以自己写了基于 CSS 多列的渲染引擎。代价是所有排版边界都要自己维护，已知退化场景在 README「已知边界」里列明了。</p></details>
+        <details><summary>怎么参与？</summary><p>项目以 MIT 开源，欢迎 Issue 与 PR。提交前至少跑一次 <code>pnpm typecheck</code>，并在描述里写清「改动前的行为 / 改动后的行为 / 怎么验证」。最缺的是排版与分页边界的回归测试、非 Windows 打包适配，以及 EPUB 样式兼容策略。</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final">
+    <div class="wrap">
+      <span class="eyebrow light" style="justify-content:center">OPEN SOURCE · MIT</span>
+      <h2>书是你的，读书的地方也该是</h2>
+      <p>不用账号，不依赖云端。把硬盘里那些书，放进一个真的愿意读完的地方。</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="https://github.com/tddt/book-hunter/releases/latest" target="_blank" rel="noopener">下载 Windows 版</a>
+        <a class="btn btn-outline" href="https://github.com/tddt/book-hunter" target="_blank" rel="noopener">GitHub 上给个 Star</a>
+      </div>
+      <p class="fine">书猎 Book Hunter 2.3.0 · Electron 33 / Vue 3 / TypeScript · MIT © 2026 tddt</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>书猎 Book Hunter · 本地优先的电子书库与阅读器</span>
+    <div class="links">
+      <a href="https://github.com/tddt/book-hunter" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/tddt/book-hunter/releases" target="_blank" rel="noopener">Releases</a>
+      <a href="https://github.com/tddt/book-hunter/blob/main/docs/DEVELOPMENT.md" target="_blank" rel="noopener">开发文档</a>
+      <a href="https://github.com/tddt/book-hunter/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var nav=document.getElementById('nav');
+  var onScroll=function(){ nav.classList.toggle('scrolled', window.scrollY>12); };
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  var els=document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    },{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+    els.forEach(function(el,i){ el.style.transitionDelay=(Math.min(i%3,2)*70)+'ms'; io.observe(el); });
+  }else{ els.forEach(function(el){ el.classList.add('in'); }); }
+
+  var btn=document.getElementById('copyBtn');
+  if(btn){ btn.addEventListener('click',function(){
+    var lines=['pnpm install','pnpm dev','pnpm build','pnpm dist:dir','pnpm dist:win'];
+    var t=lines.join('\n');
+    var done=function(){ btn.textContent='已复制'; setTimeout(function(){ btn.textContent='复制命令'; },1800); };
+    if(navigator.clipboard&&window.isSecureContext){ navigator.clipboard.writeText(t).then(done,function(){}); }
+    else{ var ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy'); done();}catch(e){} document.body.removeChild(ta); }
+  }); }
+})();
+</script>
+</body>
+</html>

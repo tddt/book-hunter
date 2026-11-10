@@ -11,6 +11,9 @@
 ![stack](https://img.shields.io/badge/Electron%2033%20%7C%20Vue%203%20%7C%20TypeScript-42b883.svg?logo=electron&logoColor=white)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
+[![Download](https://img.shields.io/badge/Download-Windows%202.3.0-b4482f.svg?logo=windows&logoColor=white)](https://github.com/tddt/book-hunter/releases/latest)
+[![Website](https://img.shields.io/badge/Website-Project%20Page-42b883.svg)](https://tddt.github.io/book-hunter/)
+
 </div>
 
 ---
@@ -59,6 +62,19 @@
 
 ## 🚀 快速开始
 
+### 直接安装（推荐）
+
+到 [Releases](https://github.com/tddt/book-hunter/releases/latest) 下载预编译安装包，页面附 SHA256 供校验：
+
+| 文件 | 说明 |
+| :--- | :--- |
+| `ShuLie-Setup-2.3.0-x64.exe` | 安装版，自动注册 `.epub` 文件关联 |
+| `ShuLie-Portable-2.3.0-x64.exe` | 便携版，不写注册表，放到任意目录即可运行 |
+
+> 若安装版被本机安全软件误拦，可改用便携版，或把整个目录复制到项目路径之外再运行。
+
+### 从源码构建
+
 环境要求：**Node.js 20+**、**pnpm 9+**、Windows（当前打包目标）。仓库内 `.npmrc` 已配置国内镜像。
 
 ```bash
@@ -70,8 +86,6 @@ pnpm build            # 构建 main / preload / renderer 三层
 pnpm dist:dir         # 产出免安装目录 dist/win-unpacked
 pnpm dist:win         # 产出 NSIS 安装版 + 便携版 exe
 ```
-
-`pnpm dist:win` 的产物为 `ShuLie-Setup-*.exe`（安装版，自动注册 `.epub` 关联）与 `ShuLie-Portable-*.exe`（便携版）。预编译安装包尚未发布到 Releases，目前请从源码构建。
 
 数据全部保存在本地 `%APPDATA%\书猎\library\`：书目、进度、书签、笔记、译文缓存都在这里，**备份整个 `library` 目录即可完整迁移**。删除书籍默认只移除书库记录，不动原文件。
 
@@ -93,7 +107,7 @@ src/
 ├── preload/     contextBridge 白名单
 └── renderer/    Vue 界面 · 自研阅读引擎 · 浅/深设计系统
 scripts/         Windows 打包加固 · 图标生成
-docs/            开发与设计文档 · 界面截图
+docs/            开发与设计文档 · 界面截图 · 项目主页源码
 ```
 
 仓储、索引、扫描器、解析器、阅读引擎、书源与翻译通道都面向接口编程，替换实现只需调整 `src/main/container.ts` 与适配器注册表；书库上万本时可把仓储换成 SQLite + FTS5，上层服务与 IPC 不用动。完整取舍、目录树与版本演进见 **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)**。
@@ -111,7 +125,7 @@ docs/            开发与设计文档 · 界面截图
 
 ## 🗺 路线图
 
-- [ ] 发布 GitHub Release 预编译安装包
+- [x] 发布 GitHub Release 预编译安装包（v2.3.0）
 - [ ] 书库一键备份与恢复、迁移向导
 - [ ] 125% / 150% / 200% 系统缩放与多显示器 DPI 专项回归
 - [ ] 代码签名与自动更新通道
