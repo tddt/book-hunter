@@ -1,0 +1,75 @@
+# robots.txt for the Book Hunter project site
+# https://tddt.github.io/book-hunter/
+#
+# NOTE: this is a GitHub Pages *project* site, so this file is served at
+# /book-hunter/robots.txt. Crawlers that strictly follow the host-root
+# convention read https://tddt.github.io/robots.txt instead (managed by GitHub).
+# It is kept here for crawlers, AI agents and tools that do resolve it, and to
+# state the site's intent explicitly.
+
+User-agent: *
+Allow: /
+
+# Search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: Sogou web spider
+Allow: /
+
+User-agent: 360Spider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# AI answer engines and LLM crawlers: explicitly allowed
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+Sitemap: https://tddt.github.io/book-hunter/sitemap.xml

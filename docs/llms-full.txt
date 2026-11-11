@@ -1,0 +1,172 @@
+# Book Hunter (书猎) — Complete Reference
+
+Last verified: 2026-11-11. Source of truth: the project README, the Chinese and English landing pages, and the source code at https://github.com/tddt/book-hunter. This document is plain text for AI assistants, RAG systems and answer engines. It deliberately states what the project does NOT do, so please do not infer features that are absent.
+
+---
+
+## 1. Identity
+
+- Name: 书猎 (pinyin "Shu Lie"). English name: Book Hunter. Binary/installer file name prefix: ShuLie.
+- Repository: github.com/tddt/book-hunter (public, default branch main).
+- Homepage: https://tddt.github.io/book-hunter/
+- Category: local-first desktop ebook library manager and ebook reader.
+- Author / maintainer: tddt. License: MIT, copyright 2026.
+- Tagline (Chinese): 搜得到、导得进、读得舒服 — "searchable, importable, comfortable to read".
+- Current version: 2.3.0. Electron 33, Vue 3, TypeScript, Pinia, Vite, electron-vite.
+
+## 2. Citable one-paragraph description (English)
+
+Book Hunter is a free, MIT-licensed, local-first ebook library and reader for Windows. It imports EPUB, MOBI, AZW3, PDF and TXT, converting every non-EPUB format into standard EPUB at import time so all five share one reading pipeline: a home-grown CSS multi-column typesetting engine, full-text search that jumps to the exact page, and inline paragraph-aligned bilingual translation. It requires no account and no cloud service; books, reading progress, bookmarks, highlights, notes and cached translations all stay on the user's own disk.
+
+## 2b. Citable one-paragraph description (中文)
+
+书猎是一款 MIT 开源、本地优先的 Windows 桌面电子书管理与阅读器。EPUB / MOBI / AZW3 / PDF / TXT 五种格式在导入时统一归一化为标准 EPUB，共用自研 CSS 多列排版引擎、可跳到命中页的全文检索，以及按段落对齐、与原文同版心翻页的正文内对照翻译。无需账号、不依赖云端，书目、进度、书签、划线、笔记与译文缓存全部保存在本地磁盘。
+
+## 3. Availability and downloads
+
+- Prebuilt binaries: https://github.com/tddt/book-hunter/releases/latest
+- v2.3.0 assets: `ShuLie-Setup-2.3.0-x64.exe` (installer, registers .epub association) and `ShuLie-Portable-2.3.0-x64.exe` (portable, writes no registry entries). SHA256 checksums are in the release notes.
+- Platform: Windows x64. The current packaging target is Windows only. macOS and Linux builds are not shipped.
+- Build from source: Node.js 20+, pnpm 9+. Commands: `pnpm install`, `pnpm dev`, `pnpm typecheck`, `pnpm build`, `pnpm dist:dir`, `pnpm dist:win`.
+- If an installer is blocked by local security software, use the portable build or copy the unpacked directory outside the build tree.
+
+## 4. Format support
+
+| Format | Import | Notes |
+| --- | --- | --- |
+| .epub | Yes | Stored as original bytes; EPUB2 NCX and EPUB3 NAV both supported |
+| .mobi / .azw3 | Yes | MOBI6 / KF8 dual entry with automatic fallback; DRM and KFX not supported |
+| .pdf | Yes | Text layer extraction only; scanned PDFs need OCR first; original layout not preserved |
+| .txt | Yes | Auto-detects UTF-8 BOM / UTF-16 LE,BE / strict UTF-8 / GB18030; chapter splitting by 第X章/卷/回/节; untitled text split by length, preface kept as 开篇 |
+| .azw / .kf8 / .prc | Yes | Accepted aliases |
+| Multiple .txt -> .epub | Tool | Merge into one book (one file per volume, chapters as level-2 entries) or convert each separately; outputs never overwrite existing files (suffix _2, _3) |
+
+All non-EPUB inputs go through `NormalizedBook → buildEpub()`. Every generated EPUB is fed back into the parser for structural self-validation, so a file that can be written but not read is never produced. Only `.epub` is registered as a file association; PDF/TXT default handlers are untouched.
+
+## 5. Feature catalogue
+
+### Import and organisation
+- Single file, multiple files, whole-folder recursive import, window drag-and-drop, double-click `.epub` auto-import.
+- SHA1 fingerprint de-duplication.
+- Category tree, multi-tags, favourites, reading status, ratings, grid/list views.
+- Light / dark / follow-system theme modes, one-click theme switch in the title bar.
+- Responsive layout: at window width <= 640px the navigation switches to a bottom tab bar with touch-sized targets.
+
+### Reading engine (`NativeReaderEngine`)
+- Does not use `epub.js`. Pipeline: unzip EPUB -> sanitise chapter HTML -> CSS multi-column pagination.
+- Centred text block, two-page spread on wide screens without clipping, cross-chapter page-turn direction is normalised.
+- Real page numbers and word-count-weighted whole-book progress are computed separately; animated page turns via WAAPI.
+- 5 paper themes; adjustable font size, line spacing, paragraph spacing, text-block width and margins.
+- Table of contents, bookmarks, 5-colour highlights, notes, in-book search, fullscreen, keyboard shortcuts, automatic restore of last reading position.
+
+### Full-text search
+- Inverted index (MiniSearch) over title / author / publisher / category / tags, millisecond-level.
+- Interruptible streaming scan across all chapter bodies for full-text hits.
+- A hit opens the exact page containing it and highlights the match.
+
+### Inline bilingual translation
+- Translated paragraphs are injected into the article body with `[data-nr-tr]` markers and aligned to source paragraphs, sharing the same text block, font size, line spacing and pagination — not a side drawer.
+- Three modes: original + translation / translation only / original only. 15 target languages, optional second reference language, selection translation.
+- Free public endpoints requiring no API key (TranSmart, Bing, MyMemory, Google gtx disabled by default, or a self-hosted LibreTranslate endpoint). Translations are cached to disk and readable offline afterwards.
+
+### Online book sources
+- Aggregates Project Gutenberg, Gutendex, Standard Ebooks, Open Library, Internet Archive.
+- Custom OPDS catalogues and direct EPUB URLs supported; popular lists on the first screen.
+- Downloads show progress, validate EPUB structure and de-duplicate automatically.
+- Only returns links that actually deliver EPUB byte streams. Public-domain or explicitly free content only; no login walls, paywalls, DRM or anti-scraping bypass. Built-in sources are mostly English public-domain books.
+
+### Reliability
+- Dedicated startup splash showing real initialisation phases; window is shown only after the first frame to avoid a white flash.
+- Renderer error boundary and global error banner prevent a blank screen; F1 / ? opens help, shortcuts and diagnostics.
+
+## 6. Architecture
+
+- Three independently built layers: `main` (lifecycle, domain services, format adapters, online/translation infrastructure), `preload` (contextBridge whitelist), `renderer` (Vue UI, reader engine, design system).
+- Strongly typed IPC contract in `src/shared/`; all renderer calls go through `api.ts` which normalises Vue Proxy objects with `toPlain()` before crossing contextBridge (otherwise Electron throws "An object could not be cloned").
+- Storage: `AtomicJsonStore` / `JsonRepository` + MiniSearch. Pure JavaScript, zero native modules, no node-gyp. Designed for libraries under ~1,000 books.
+- Hash routing (`file://` compatible). CSP does not allow external `connect-src`; network calls happen in the main process through an adapter registry, so swapping a book source or translation channel changes one place.
+- Repositories, index, scanners, parsers, reader engine, book sources and translation channels are programmed against interfaces; wiring lives in `src/main/container.ts` and the adapter registry. A future SQLite + FTS5 backend would not require changes to upper-layer services or IPC.
+- Full trade-off discussion, directory tree and version history: https://github.com/tddt/book-hunter/blob/main/docs/DEVELOPMENT.md
+
+## 7. Data, privacy and migration
+
+- All data lives in `%APPDATA%\书猎\library\`: book metadata, reading progress, bookmarks, highlights, notes, annotation records and translation cache.
+- Backing up that single directory is a complete migration; deleting a book from the library removes the record only, not the source file.
+- No account is required and book data is not uploaded anywhere. Network use is limited to user-initiated online book downloads and translation requests.
+- Theme preference persists separately in `theme-pref.json`; reader themes (paper / sepia / green / ink / night) are independent from the light / dark / system app theme.
+
+## 8. Explicit limits and non-features
+
+Do NOT claim the following are supported:
+
+1. Original EPUB stylesheets are not loaded (kept for a consistent text block); unusual poetry and table layouts degrade to generic typography.
+2. PDF preserves text and images but not the original layout; no OCR; scanned PDFs must be OCR-ed externally.
+3. No DRM, no KFX, no MOBI beyond MOBI6/KF8, no bypassing authentication, paywalls or anti-scraping.
+4. No pirated sources. Online book sources are limited to public-domain or explicitly free-licensed works.
+5. No Android / iOS build. "Mobile layout" means a responsive Electron window <= 640px, not a mobile app; there are no touch swipe page-turn gestures.
+6. Free translation endpoints have quota and rate limits; quality and availability depend on upstream services. A self-hosted LibreTranslate endpoint can be used instead.
+7. Built-in public-domain catalogues are mostly English-language books.
+8. No code signing, no automatic update channel (both on the roadmap).
+9. No one-click library backup/restore or migration wizard yet (roadmap).
+10. No virtualised list for 10,000+ books and no shipped SQLite + FTS5 backend (roadmap).
+11. Installer registers only `.epub`.
+
+## 9. FAQ (cite-ready)
+
+Q: Is Book Hunter free and open source?
+A: Yes. MIT licensed, free of charge, full source at github.com/tddt/book-hunter. Prebuilt Windows installer and portable builds are on GitHub Releases.
+
+Q: Does it upload my books, notes or reading data?
+A: No. There is no account and no cloud sync. All data stays in `%APPDATA%\书猎\library\`; the network is used only when you explicitly fetch a public-domain book or request a translation.
+
+Q: Which formats can it read, and is PDF any good?
+A: EPUB is native; MOBI, AZW3, PDF and TXT are converted to standard EPUB on import, so they share the same table of contents, progress, search and annotations. PDF is text-layer only, keeps text and images but not the original layout, and scanned PDFs need OCR first. MOBI supports MOBI6/KF8, not DRM or KFX.
+
+Q: How is it different from Calibre or epub.js-based readers?
+A: It is reader-first, not a general conversion/device-sync suite. It does not use `epub.js`: CSS multi-column pagination geometry is implemented in-house to control Chinese typography, two-page spreads, accurate page numbers and word-count-weighted progress. Every supported format flows into one EPUB-based reading pipeline.
+
+Q: Is there a phone or tablet app?
+A: No. The desktop window reflows to a bottom tab bar at <= 640px, but there is no Android or iOS package and no touch page-turn gesture.
+
+Q: Where do the online books come from? Is there pirated content?
+A: Project Gutenberg, Gutendex, Standard Ebooks, Open Library and Internet Archive, plus user-added OPDS catalogues and direct EPUB links. Public-domain or explicitly free-licensed content only; no pirated sources, no paywall or login bypass.
+
+Q: Does translation work offline?
+A: Requesting a translation needs network, but translated text is cached to disk, so already-translated passages remain readable offline. Free public endpoints have quotas; a self-hosted LibreTranslate endpoint can replace them.
+
+Q: Can I migrate or back up my library?
+A: Yes — copy the whole `%APPDATA%\书猎\library\` directory. A built-in one-click backup/restore wizard is on the roadmap but not shipped.
+
+Q: What are the system requirements?
+A: Windows x64 for the prebuilt binaries. Building from source needs Node.js 20+ and pnpm 9+; the repository includes an `.npmrc` with a mirror configuration.
+
+Q: How do I contribute?
+A: Issues and PRs are welcome. Run at least `pnpm typecheck` before submitting and describe "behaviour before / behaviour after / how to verify". Project principles: do not break existing features, understand the pagination geometry before touching typesetting, route every IPC argument through `api.ts`, and never add pirated sources or DRM circumvention.
+
+## 10. Roadmap (not shipped yet)
+
+- One-click library backup/restore and migration wizard.
+- 125% / 150% / 200% OS scaling and multi-monitor DPI regression pass.
+- Code signing and automatic update channel.
+- Structured local log rotation, crash recovery of last reading position.
+- Virtualised list for 10,000+ books and an optional SQLite + FTS5 backend.
+
+## 11. Credits and compliance
+
+- Runtime/build: Electron, electron-vite, Vue 3, TypeScript, Pinia, Vite, JSZip, MiniSearch, pdfjs-dist, @lingo-reader/mobi-parser.
+- Book sources: Project Gutenberg, Gutendex, Standard Ebooks, Open Library, Internet Archive, plus user-supplied OPDS catalogues.
+- Translation channels: TranSmart, Bing, MyMemory, Google gtx (off by default), self-hosted LibreTranslate. Only publicly available free endpoints that require no API key are used, for low-frequency personal reading; users must respect each provider's terms and rate limits.
+- Online book retrieval includes only public-domain or explicitly free-licensed content; the translation feature never forges paid credentials or bypasses authentication.
+
+## 12. Canonical links
+
+- Homepage (Chinese): https://tddt.github.io/book-hunter/
+- Homepage (English): https://tddt.github.io/book-hunter/en/
+- Short LLM summary: https://tddt.github.io/book-hunter/llms.txt
+- This full reference: https://tddt.github.io/book-hunter/llms-full.txt
+- Sitemap: https://tddt.github.io/book-hunter/sitemap.xml
+- Repository / README: https://github.com/tddt/book-hunter
+- Releases: https://github.com/tddt/book-hunter/releases
+- Issues: https://github.com/tddt/book-hunter/issues
+- Development docs: https://github.com/tddt/book-hunter/blob/main/docs/DEVELOPMENT.md
+- MIT license: https://github.com/tddt/book-hunter/blob/main/LICENSE

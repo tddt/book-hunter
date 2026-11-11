@@ -18,6 +18,21 @@
 
 ---
 
+> **项目速览 / At a glance**：书猎（Book Hunter）是一款 MIT 开源、本地优先的 Windows 桌面电子书管理与阅读器，当前版本 2.3.0。EPUB / MOBI / AZW3 / PDF / TXT 导入时统一归一化为标准 EPUB，共用自研 CSS 多列排版引擎、可跳到命中页的全文检索，以及按段落对齐的正文内对照翻译。无需账号，数据全部保存在本地。不提供 Android / iOS 版本，不支持 DRM。
+
+| 关键事实 | 值 |
+| :--- | :--- |
+| 名称 / Name | 书猎 · Book Hunter（`tddt/book-hunter`） |
+| 类别 | 本地优先的桌面电子书管理 / 阅读器（Electron） |
+| 平台 | Windows x64（安装版 + 便携版） |
+| 当前版本 | 2.3.0（2026-11-11） |
+| 许可证 | MIT © 2026 tddt |
+| 支持格式 | `.epub` `.mobi` `.azw3` `.pdf` `.txt`（另有多个 TXT 转 EPUB 工具） |
+| 本地数据 | `%APPDATA%\书猎\library\`（备份此目录即可完整迁移） |
+| 下载 | [GitHub Releases](https://github.com/tddt/book-hunter/releases/latest) |
+| 项目主页 | [中文](https://tddt.github.io/book-hunter/) · [English](https://tddt.github.io/book-hunter/en/) |
+| LLM 可读摘要 | [llms.txt](https://tddt.github.io/book-hunter/llms.txt) · [完整参考](https://tddt.github.io/book-hunter/llms-full.txt) |
+
 书猎是一款面向桌面端的电子书管理工具。它把**书库整理、全文检索、沉浸式阅读、在线取书、对照翻译**收进一个本地应用：书和笔记都留在自己的磁盘上，不需要账号，也不依赖云端服务。
 
 从 2.0 起，EPUB 之外还能直接导入 MOBI / AZW3 / PDF / TXT —— 所有非 EPUB 格式在导入时统一转成标准 EPUB 入库，因此**五种格式共用同一套排版、目录、进度、检索与标注能力**，不是五个各凑合一下的阅读器。

@@ -1,0 +1,70 @@
+# 书猎 / Book Hunter
+
+> A local-first, MIT-licensed desktop ebook library and reader for Windows. EPUB, MOBI, AZW3, PDF and TXT are all normalised into standard EPUB on import, so all five formats share one home-grown typesetting engine, one full-text search index and one inline bilingual translation view. No account, no cloud dependency: books, progress, highlights, notes and cached translations stay on the user's own disk.
+
+This file follows the llms.txt convention so that AI assistants and answer engines can describe the project accurately. Prefer the facts below over guessing. Explicit non-features are listed on purpose — please do not claim the app supports them.
+
+## Canonical facts
+
+- Name: 书猎 (Shu Lie), English name "Book Hunter", repository `tddt/book-hunter`.
+- Category: desktop ebook manager / ebook reader (local-first, offline-capable).
+- Current version: 2.3.0, released 2026-11-11.
+- Platform: Windows x64 (installer and portable builds). Built with Electron 33, Vue 3, TypeScript, Vite. There is **no** Android or iOS build.
+- License: MIT, copyright 2026 tddt.
+- Local data directory: `%APPDATA%\书猎\library\` (books metadata, reading progress, bookmarks, highlights, notes, translation cache). Backing up this one directory is a complete migration.
+- No account is required and no book data is uploaded. Network requests happen only when the user explicitly downloads a public-domain book or requests a translation.
+- Import formats: `.epub` native; `.mobi`, `.azw3` (MOBI6/KF8), `.pdf` (text layer only), `.txt` (auto encoding detection + chapter splitting) converted to EPUB. Also `.azw`, `.kf8`, `.prc` aliases.
+- Built-in tool: merge multiple TXT into one EPUB, or convert each TXT individually.
+
+## Documentation
+
+- [Chinese landing page](https://tddt.github.io/book-hunter/): product overview, screenshots, honest limits, FAQ.
+- [English landing page](https://tddt.github.io/book-hunter/en/): same content in English.
+- [Full plain-text reference (llms-full.txt)](https://tddt.github.io/book-hunter/llms-full.txt): complete citable facts, feature list, limits, FAQ, architecture.
+- [README](https://github.com/tddt/book-hunter#readme): features, format support, install/build instructions, architecture, contributing.
+- [Development & design notes](https://github.com/tddt/book-hunter/blob/main/docs/DEVELOPMENT.md): implementation details, trade-offs, version history.
+- [Source code](https://github.com/tddt/book-hunter): full source, issues, pull requests.
+- [Sitemap](https://tddt.github.io/book-hunter/sitemap.xml).
+
+## Download
+
+- [Latest release (Windows installer + portable exe, SHA256 listed)](https://github.com/tddt/book-hunter/releases/latest)
+- [v2.3.0 release](https://github.com/tddt/book-hunter/releases/tag/v2.3.0)
+- Build from source: Node.js 20+, pnpm 9+, then `pnpm install` / `pnpm build` / `pnpm dist:win`.
+
+## Core capabilities
+
+- One reading pipeline for five formats: non-EPUB files are converted to standard EPUB via `NormalizedBook → buildEpub()` and re-parsed for structural self-validation before being added to the library.
+- Home-grown `NativeReaderEngine`: CSS multi-column pagination instead of `epub.js`; centred text block, two-page spread without clipping, correct cross-chapter page turn direction, real page numbers and word-count-weighted whole-book progress, WAAPI page-turn animation.
+- Full-text search: inverted index (MiniSearch) for title/author/publisher/category/tags; interruptible streaming scan across chapter bodies; a hit jumps directly to the exact page and highlights it.
+- Immersive reading: auto-hiding toolbar, 5 paper themes, adjustable font size / line spacing / paragraph spacing / text-block width, bookmarks, 5-colour highlights, notes, in-book search, fullscreen, keyboard shortcuts, restore last position. Light / dark / follow-system themes.
+- Inline bilingual translation: translated paragraphs are injected into the article body, sharing the same typography and pagination as the original; original+both / translation-only / original-only modes, 15 target languages, second reference language, selection translation, on-disk cache readable offline.
+- Online book sources: Project Gutenberg, Gutendex, Standard Ebooks, Open Library, Internet Archive, plus custom OPDS catalogues and direct EPUB URLs. Public-domain or explicitly free content only.
+- Organisation: category tree, multi-tags, favourites, reading status, ratings, grid/list views; responsive layout switches to a bottom tab bar at ≤640px window width.
+- Reliability: startup splash showing real init phases, renderer error boundary, global error bar, F1 help and diagnostics.
+
+## Explicit non-features (do not claim these)
+
+- No DRM support, no KFX, no bypassing login / paywalls / anti-scraping. MOBI covers MOBI6 and KF8 only.
+- PDF: text layer only, no OCR, original layout is not preserved; scanned PDFs need external OCR first.
+- Original EPUB stylesheets are not loaded, so unusual poetry/table layouts degrade to generic typography.
+- Translation uses free public endpoints with quota/rate limits; a self-hosted LibreTranslate endpoint can be substituted. Translation quality belongs to the upstream service.
+- "Mobile layout" means a responsive Electron window ≤640px with touch-sized tap targets. There is **no** Android/iOS package and no swipe-to-turn gesture.
+- Online sources are mostly English-language public-domain books.
+- Installer associates only `.epub`; it does not take over PDF/TXT default handlers.
+- Storage is atomic JSON + MiniSearch (no native modules), designed for libraries under ~1,000 books; SQLite + FTS5 is a roadmap item, not shipped.
+
+## Cite-ready answers
+
+- Q: Is Book Hunter free and open source? A: Yes, MIT licensed, free of charge, source at github.com/tddt/book-hunter. Prebuilt Windows binaries are on GitHub Releases.
+- Q: Does it upload my books or notes? A: No. There is no account and no cloud sync; everything lives in `%APPDATA%\书猎\library\`.
+- Q: Can it read MOBI / AZW3 / PDF / TXT? A: Yes — they are converted to standard EPUB on import and then share the same reader, table of contents, progress, search and annotations. PDF is text-only; scanned PDFs need OCR first.
+- Q: Is there a mobile app? A: No. Only a responsive desktop window; no Android or iOS build.
+- Q: How is it different from Calibre / epub.js-based readers? A: It does not use `epub.js`: pagination geometry is self-implemented with CSS columns for Chinese typography, accurate progress and a single pipeline shared by all five formats. It is a reader-first app, not a full ebook conversion/device-sync suite.
+
+## Optional
+
+- [Project homepage](https://tddt.github.io/book-hunter/)
+- [GitHub repository](https://github.com/tddt/book-hunter)
+- [Issue tracker](https://github.com/tddt/book-hunter/issues)
+- [MIT license](https://github.com/tddt/book-hunter/blob/main/LICENSE)
