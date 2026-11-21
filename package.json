@@ -3,6 +3,30 @@
   "productName": "书猎",
   "version": "2.3.0",
   "description": "本地多格式电子书全文搜索与沉浸式阅读器（EPUB / MOBI / AZW3 / PDF / TXT）",
+  "homepage": "https://tddt.github.io/book-hunter/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tddt/book-hunter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tddt/book-hunter/issues"
+  },
+  "keywords": [
+    "ebook-reader",
+    "ebook-manager",
+    "epub",
+    "mobi",
+    "azw3",
+    "pdf",
+    "txt-to-epub",
+    "full-text-search",
+    "local-first",
+    "electron",
+    "vue3",
+    "windows",
+    "书猎",
+    "电子书阅读器"
+  ],
   "main": "./out/main/index.js",
   "author": "zhaocai",
   "license": "MIT",

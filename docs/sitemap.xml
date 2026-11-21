@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://tddt.github.io/book-hunter/</loc>
     <lastmod>2026-11-11</lastmod>
@@ -9,6 +10,7 @@
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tddt.github.io/book-hunter/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://tddt.github.io/book-hunter/en/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tddt.github.io/book-hunter/"/>
+    <image:image><image:loc>https://tddt.github.io/book-hunter/screenshots/shelf-dark.jpg</image:loc><image:title>书猎深色主题书架</image:title></image:image>
   </url>
   <url>
     <loc>https://tddt.github.io/book-hunter/en/</loc>
@@ -18,5 +20,6 @@
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tddt.github.io/book-hunter/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://tddt.github.io/book-hunter/en/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tddt.github.io/book-hunter/"/>
+    <image:image><image:loc>https://tddt.github.io/book-hunter/screenshots/shelf-dark.jpg</image:loc><image:title>Book Hunter dark-theme bookshelf</image:title></image:image>
   </url>
 </urlset>
