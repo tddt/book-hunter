@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use Book Hunter, please cite it as below."
+title: "Book Hunter (书猎)"
+abstract: "A local-first, MIT-licensed multi-format ebook library and reader for Windows. EPUB, MOBI, AZW3, PDF and TXT are normalised to EPUB with a home-grown typesetting engine, full-text search and inline bilingual translation."
+type: software
+version: 2.3.0
+date-released: 2026-11-11
+license: MIT
+authors:
+  - alias: tddt
+repository-code: "https://github.com/tddt/book-hunter"
+url: "https://tddt.github.io/book-hunter/"
+keywords: [ebook-reader, ebook-manager, epub, mobi, azw3, pdf, local-first, electron]
